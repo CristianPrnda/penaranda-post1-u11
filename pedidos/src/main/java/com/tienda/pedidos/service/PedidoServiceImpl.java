@@ -6,6 +6,8 @@ import com.tienda.pedidos.entity.Pedido;
 import com.tienda.pedidos.exception.RecursoNoEncontradoException;
 import com.tienda.pedidos.repository.PedidoRepository;
 import com.tienda.pedidos.strategy.EstrategiaDescuento;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,6 +15,8 @@ import java.util.Map;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
+
+    private static final Logger log = LoggerFactory.getLogger(PedidoServiceImpl.class);
 
     private final PedidoRepository repo;
     private final NotificacionService notificador;
@@ -28,9 +32,14 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponseDTO crear(PedidoRequestDTO dto) {
+        log.info("Creando pedido: clienteEmail={}, tipoCliente={}", dto.getClienteEmail(), dto.getTipoCliente());
+
         EstrategiaDescuento estrategia = estrategias.getOrDefault(
                 dto.getTipoCliente().toUpperCase(), estrategias.get("REGULAR"));
         double descuento = estrategia.calcularDescuento(dto.getSubtotal());
+        log.info("Descuento aplicado: pedido para clienteEmail={}, tipoCliente={}, descuento={}",
+                dto.getClienteEmail(), dto.getTipoCliente(), descuento);
+
         double baseConDescuento = dto.getSubtotal() - descuento;
         double iva = baseConDescuento * 0.19;
         double total = baseConDescuento + iva;
@@ -47,6 +56,8 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setFechaCreacion(LocalDateTime.now());
 
         Pedido guardado = repo.save(pedido);
+        log.info("Pedido creado exitosamente con id={}", guardado.getId());
+
         notificador.enviarConfirmacion(guardado.getClienteEmail(), guardado.getTotal());
 
         return toResponseDTO(guardado);
@@ -54,8 +65,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponseDTO buscarPorId(Long id) {
-        Pedido p = repo.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Pedido", id));
+        log.debug("Buscando pedido con id={}", id);
+        Pedido p = repo.findById(id).orElseThrow(() -> {
+            log.warn("Pedido con id={} no encontrado", id);
+            return new RecursoNoEncontradoException("Pedido", id);
+        });
         return toResponseDTO(p);
     }
 
