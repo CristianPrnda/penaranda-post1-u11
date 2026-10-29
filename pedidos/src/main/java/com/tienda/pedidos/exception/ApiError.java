@@ -1,13 +1,24 @@
 package com.tienda.pedidos.exception;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
 public class ApiError {
 
+    @Schema(description = "Código de estado HTTP", example = "404")
     private int status;
+
+    @Schema(description = "Razón o nombre del error HTTP", example = "Not Found")
     private String error;
+
+    @Schema(description = "Mensaje detallado del error o motivo de validación", example = "Pedido con id 999 no encontrado.")
     private String mensaje;
+
+    @Schema(description = "Marca de tiempo del error", example = "2026-10-29T10:45:00.000")
     private String timestamp;
+
+    @Schema(description = "Ruta URI invocada", example = "/api/pedidos/999")
     private String path;
 
     public ApiError() {
