@@ -5,29 +5,32 @@ import com.tienda.pedidos.dto.PedidoResponseDTO;
 import com.tienda.pedidos.entity.Pedido;
 import com.tienda.pedidos.exception.RecursoNoEncontradoException;
 import com.tienda.pedidos.repository.PedidoRepository;
+import com.tienda.pedidos.strategy.EstrategiaDescuento;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
 
     private final PedidoRepository repo;
     private final NotificacionService notificador;
+    private final Map<String, EstrategiaDescuento> estrategias;
 
-    public PedidoServiceImpl(PedidoRepository repo, NotificacionService notificador) {
+    public PedidoServiceImpl(PedidoRepository repo,
+                             NotificacionService notificador,
+                             Map<String, EstrategiaDescuento> estrategias) {
         this.repo = repo;
         this.notificador = notificador;
+        this.estrategias = estrategias;
     }
 
     @Override
     public PedidoResponseDTO crear(PedidoRequestDTO dto) {
-        double descuento = 0.0;
-        if ("VIP".equalsIgnoreCase(dto.getTipoCliente())) {
-            descuento = dto.getSubtotal() * 0.15;
-        } else if ("MAYORISTA".equalsIgnoreCase(dto.getTipoCliente())) {
-            descuento = dto.getSubtotal() * 0.25;
-        }
+        EstrategiaDescuento estrategia = estrategias.getOrDefault(
+                dto.getTipoCliente().toUpperCase(), estrategias.get("REGULAR"));
+        double descuento = estrategia.calcularDescuento(dto.getSubtotal());
         double baseConDescuento = dto.getSubtotal() - descuento;
         double iva = baseConDescuento * 0.19;
         double total = baseConDescuento + iva;
