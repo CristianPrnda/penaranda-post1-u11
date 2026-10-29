@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "API de Pedidos - Unidad 11",
+    "description": "Colección de pruebas REST para el laboratorio de la Unidad 11: SOLID, DTO, Strategy, GlobalExceptionHandler, SLF4J y Swagger OpenAPI.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Crear Pedido - VIP (15% Desc)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteEmail\": \"ana@correo.com\",\n  \"tipoCliente\": \"VIP\",\n  \"subtotal\": 100000.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/pedidos",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "pedidos"]
+        }
+      }
+    },
+    {
+      "name": "2. Crear Pedido - MAYORISTA (25% Desc)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteEmail\": \"carlos@correo.com\",\n  \"tipoCliente\": \"MAYORISTA\",\n  \"subtotal\": 100000.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/pedidos",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "pedidos"]
+        }
+      }
+    },
+    {
+      "name": "3. Crear Pedido - REGULAR (0% Desc)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteEmail\": \"pedro@correo.com\",\n  \"tipoCliente\": \"REGULAR\",\n  \"subtotal\": 100000.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/pedidos",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "pedidos"]
+        }
+      }
+    },
+    {
+      "name": "4. Obtener Pedido por ID (200 OK)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pedidos/{{pedidoId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "pedidos", "{{pedidoId}}"]
+        }
+      }
+    },
+    {
+      "name": "5. Obtener Pedido Inexistente (404 Not Found & ApiError)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pedidos/999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "pedidos", "999"]
+        }
+      }
+    },
+    {
+      "name": "6. Crear Pedido Inválido (400 Bad Request & ApiError)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/pedidos",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "pedidos"]
+        }
+      }
+    }
+  ]
+}
